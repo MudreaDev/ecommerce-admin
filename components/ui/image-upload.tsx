@@ -53,7 +53,7 @@ src={url}
                     </div>
                 ))}
                 </div>
-                <CldUploadWidget onUpload={onUpload} uploadPreset="npqshzol">
+                <CldUploadWidget onSuccess={onUpload} uploadPreset="npqshzol">
                     {({ open }) => {
                         const onClick = () => {
                             open();

@@ -152,8 +152,10 @@ className="space-y-8 w-full">
 <ImageUpload 
 value={field.value.map((image) => image.url )}
 disabled={loading}
-onChange={(url) => field.onChange([...field.value, { url }])}
-onRemove={(url) => field.onChange([...field.value.filter((current) => current.url !== url)])}
+onChange={(url) => {
+    const fieldValue = [...field.value, { url }];
+    field.onChange((field.value = fieldValue));
+}}onRemove={(url) => field.onChange([...field.value.filter((current) => current.url !== url)])}
 
 />
 

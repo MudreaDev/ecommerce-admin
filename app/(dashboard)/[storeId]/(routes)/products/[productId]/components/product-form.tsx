@@ -19,7 +19,7 @@ import * as z from "zod"
 
 const formSchema = z.object({
     name: z.string().min(1),
-    images: z.object({ url: z.string()}).array,
+    images: z.object({ url: z.string()}).array(),
     price: z.coerce.number().min(1),
     categoryId: z.string().min(1),
     colorId: z.string().min(1),
@@ -153,7 +153,7 @@ className="space-y-8 w-full">
 value={field.value.map((image) => image.url )}
 disabled={loading}
 onChange={(url) => field.onChange([...field.value, { url }])}
-onRemove={() => field.onChange([...field.value.filter((current) => current.url !== url)])}
+onRemove={(url) => field.onChange([...field.value.filter((current) => current.url !== url)])}
 
 />
 

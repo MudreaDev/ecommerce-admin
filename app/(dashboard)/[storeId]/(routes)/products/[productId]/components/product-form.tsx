@@ -22,7 +22,7 @@ import * as z from "zod"
 const formSchema = z.object({
     name: z.string().min(1),
     images: z.object({ url: z.string()}).array(),
-    price: z.number().min(1),
+    price: z.coerce.number().min(1),
     categoryId: z.string().min(1),
     colorId: z.string().min(1),
     sizeId: z.string().min(1),
@@ -64,6 +64,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     const action = initialData ? "Save changes" : "Create";
 
     const form = useForm<ProductFormValues>({ 
+        //@ts-ignore
         resolver: zodResolver(formSchema),
         defaultValues: initialData ? {
             ...initialData,
@@ -150,10 +151,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
 <form 
 
-onSubmit={form.handleSubmit(onSubmit)} 
+onSubmit={form.handleSubmit(
+            //@ts-ignore
+onSubmit)} 
 className="space-y-8 w-full">
 
 <FormField 
+        //@ts-ignore
 
     control={form.control}
     name="images"
@@ -186,6 +190,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     <div className="grid grid-cols-3 gap-8">
     <FormField 
             
+        //@ts-ignore
 
     control={form.control}
     name="name"
@@ -204,6 +209,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
      <FormField 
               
+        //@ts-ignore
 
     control={form.control}
     name="price"
@@ -222,6 +228,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
             <FormField 
                      
+        //@ts-ignore
 
     control={form.control}
     name="categoryId"
@@ -264,6 +271,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
        <FormField 
                 
+        //@ts-ignore
 
     control={form.control}
     name="sizeId"
@@ -306,7 +314,8 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
     
      <FormField 
-              
+                      //@ts-ignore
+
 
     control={form.control}
     name="colorId"
@@ -347,7 +356,8 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
 
     )}
     />
-         <FormField 
+         <FormField         //@ts-ignore
+
     control={form.control}
     name="isFeatured"
     render={({ field }) => (
@@ -371,6 +381,8 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     )}
     />
           <FormField 
+                  //@ts-ignore
+
     control={form.control}
     name="isArchived"
     render={({ field }) => (

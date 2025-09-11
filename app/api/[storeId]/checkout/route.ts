@@ -14,10 +14,11 @@ export async function OPTIONS() {
 
 export async function POST(
     req: Request,
-    { params }: { params: { storeId: string } }
+    { params }: { params: Promise<{ storeId: string }> }
 ) {
     try {
         const { productIds } = await req.json();
+        const { storeId } = await params;
         
         if (!productIds || productIds.length === 0) {
             return new NextResponse("Product IDs are required", { status: 400 });
@@ -37,7 +38,7 @@ export async function POST(
         // Creează order în baza de date
         const order = await prismadb.order.create({
             data: {
-                storeId: params.storeId,
+                storeId: storeId,
                 isPaid: false,
                 orderItems: {
                     create: productIds.map((productId: string) => ({
@@ -57,7 +58,7 @@ export async function POST(
             currency: 'USD',
             order_id: order.id,
             url_return: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
-            url_callback: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/${params.storeId}/webhook/cryptomus`,
+            url_callback: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/${storeId}/webhook/cryptomus`,
             to_currency: 'USDT', // sau altă crypto dorită
             lifetime: 3600, // 1 oră
         };

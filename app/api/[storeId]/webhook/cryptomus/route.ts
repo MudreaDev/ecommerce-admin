@@ -5,12 +5,13 @@ import prismadb from "@/lib/prismadb";
 
 export async function POST(
     req: Request,
-    { params }: { params: { storeId: string } }
+    { params }: { params: Promise<{ storeId: string }> }
 ) {
     try {
         const body = await req.json();
         const headersList = await headers();
         const sign = headersList.get("sign");
+        const { storeId } = await params;
 
         if (!sign) {
             return new NextResponse("Missing signature", { status: 400 });

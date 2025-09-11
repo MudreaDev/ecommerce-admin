@@ -2,7 +2,8 @@
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Copy, Server } from "lucide-react";
-import { Badge, BadgeProps } from "@/components/ui/badge";
+import { Badge, badgeVariants } from "@/components/ui/badge";
+import { type VariantProps } from "class-variance-authority";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 interface ApiAlertProps {
@@ -16,8 +17,7 @@ const textMap: Record<ApiAlertProps["variant"], string> = {
     admin: "Admin",
 };
 
-const variantMap: Record<ApiAlertProps["variant"], BadgeProps["variant"]> = {
-    public: "secondary",
+const variantMap: Record<ApiAlertProps["variant"], VariantProps<typeof badgeVariants>["variant"]> = {    public: "secondary",
     admin: "destructive",
 };
 

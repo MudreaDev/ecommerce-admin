@@ -10,15 +10,33 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // Adaugă ignores la început, separat
   {
     ignores: [
       "node_modules/**",
-      ".next/**",
+      ".next/**", 
       "out/**",
       "build/**",
-      "next-env.d.ts",
+      "lib/**",          // Fișierele generate de Prisma
+      "prisma/generated/**",
+      "next-env.d.ts",   // Fișierul generat de Next.js
+      "**/*.wasm.js",    // Toate fișierele wasm
     ],
+  },
+  // Apoi extinde configurațiile
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // Și adaugă rules-urile
+  {
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["warn", { 
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_" 
+      }],
+      "@typescript-eslint/triple-slash-reference": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
+    },
   },
 ];
 

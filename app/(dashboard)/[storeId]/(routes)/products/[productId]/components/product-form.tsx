@@ -64,7 +64,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     const action = initialData ? "Save changes" : "Create";
 
     const form = useForm<ProductFormValues>({ 
-        //@ts-ignore
+        //@ts-expect-error
         resolver: zodResolver(formSchema),
         defaultValues: initialData ? {
             ...initialData,
@@ -152,12 +152,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 <form 
 
 onSubmit={form.handleSubmit(
-            //@ts-ignore
+            //@ts-expect-error
 onSubmit)} 
 className="space-y-8 w-full">
 
 <FormField 
-        //@ts-ignore
+        //@ts-expect-error
 
     control={form.control}
     name="images"
@@ -190,7 +190,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     <div className="grid grid-cols-3 gap-8">
     <FormField 
             
-        //@ts-ignore
+        //@ts-expect-error
 
     control={form.control}
     name="name"
@@ -209,7 +209,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
      <FormField 
               
-        //@ts-ignore
+        //@ts-expect-error
 
     control={form.control}
     name="price"
@@ -228,7 +228,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
             <FormField 
                      
-        //@ts-ignore
+        //@ts-expect-error
 
     control={form.control}
     name="categoryId"
@@ -271,7 +271,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
        <FormField 
                 
-        //@ts-ignore
+        //@ts-expect-error
 
     control={form.control}
     name="sizeId"
@@ -314,7 +314,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     />
     
      <FormField 
-                      //@ts-ignore
+                      //@ts-expect-error
 
 
     control={form.control}
@@ -356,7 +356,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
 
     )}
     />
-         <FormField         //@ts-ignore
+         <FormField         //@ts-expect-error
 
     control={form.control}
     name="isFeatured"
@@ -381,7 +381,7 @@ onRemove={(url) => field.onChange([...field.value.filter((current) => current.ur
     )}
     />
           <FormField 
-                  //@ts-ignore
+                  //@ts-expect-error
 
     control={form.control}
     name="isArchived"

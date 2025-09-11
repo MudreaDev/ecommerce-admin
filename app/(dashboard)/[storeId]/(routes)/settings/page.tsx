@@ -3,26 +3,26 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "./components/settings-form";
 interface SettingsPageProps{
-    params: {
+    params: Promise<{
      storeId: string;
-}
+}>
 };
 
 
 const SettingsPage: React.FC<SettingsPageProps> = async ({ 
     params 
-
 }) => {
     const { userId } = await auth();
 
-
     if (!userId) {
-
         redirect("/sign-in");
     }
+    
+    const { storeId } = await params;
+    
     const store = await prismadb.store.findFirst({
         where: {
-            id: params.storeId,
+            id: storeId,
             userId,
         },
     });

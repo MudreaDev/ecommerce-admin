@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { cryptomus } from "@/lib/cryptomus";
+import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
+import Stripe from "stripe";
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
@@ -14,69 +15,65 @@ export async function OPTIONS() {
 
 export async function POST(
     req: Request,
-    { params }: { params: Promise<{ storeId: string }> }
+    { params }: { params: { storeId: string } }
 ) {
-    try {
-        const { productIds } = await req.json();
-        const { storeId } = await params;
-        
-        if (!productIds || productIds.length === 0) {
-            return new NextResponse("Product IDs are required", { status: 400 });
-        }
-
-        const products = await prismadb.product.findMany({
-            where: {
-                id: { in: productIds },
-            },
-        });
-
-        // Calculează totalul
-        const totalAmount = products.reduce((total, product) => {
-            return total + product.price.toNumber();
-        }, 0);
-
-        // Creează order în baza de date
-        const order = await prismadb.order.create({
-            data: {
-                storeId: storeId,
-                isPaid: false,
-                orderItems: {
-                    create: productIds.map((productId: string) => ({
-                        product: {
-                            connect: {
-                                id: productId,
-                            },
-                        },
-                    })),
-                },
-            },
-        });
-
-        // Creează plata cu Cryptomus
-        const paymentData = {
-            amount: totalAmount.toString(),
+   const { productIds } = await req.json();
+   if (!productIds || productIds.length === 0) {
+    return new NextResponse("Product IDs are required", { status: 400 });
+   }
+   const products = await prismadb.product.findMany({
+    where: {
+        id: { in: productIds },
+    },
+   });
+   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+   products.forEach((product) => {
+    line_items.push({
+        quantity: 1,
+        price_data: {
             currency: 'USD',
-            order_id: order.id,
-            url_return: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
-            url_callback: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/${storeId}/webhook/cryptomus`,
-            to_currency: 'USDT', // sau altă crypto dorită
-            lifetime: 3600, // 1 oră
-        };
+            product_data: {
+                name: product.name,
+            },
+            unit_amount: product.price.toNumber() * 100,
+        },
 
-        const payment = await cryptomus.createPayment(paymentData);
+        
+   });
+   });
 
-        if (payment.state !== 0) {
-            throw new Error('Failed to create Cryptomus payment');
-        }
+   const order = await prismadb.order.create({
+    data: {
+        storeId: params.storeId,
+        isPaid: false,
+        orderItems: {
+            create: productIds.map((productId: string) => ({
+                product: {
+                    connect: {
+                        id: productId,
+                    },
+                },
 
-        return NextResponse.json({ 
-            url: payment.result.url,
-            paymentId: payment.result.uuid,
-            orderId: order.id 
-        }, { headers: corsHeaders });
+            })),
+        },
+        },
+   });
 
-    } catch (error) {
-        console.log('[CHECKOUT_POST]', error);
-        return new NextResponse("Internal error", { status: 500 });
-    }
+   const session = await stripe.checkout.sessions.create({
+    line_items: line_items,
+    mode: 'payment',
+    billing_address_collection: 'required',
+    phone_number_collection: {
+        enabled: true,
+    },
+    success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
+    cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
+    metadata: {
+        orderId: order.id,
+    },
+    
+
+    
+   });
+   return NextResponse.json({ url: session.url }, { headers: corsHeaders });
 }
